@@ -1,4 +1,4 @@
-name:= "hands-on-spark-ml"
+name:= "spark-blog-examples"
 
 val sparkVersion = "1.6.1"
 val cassandraVersion = "1.4.0"

@@ -11,9 +11,9 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<scala.version>2.10.4</scala.version>
-		<scala.dep.version>2.10</scala.dep.version>
-		<spark.version>1.5.0</spark.version>
+		<scala.version>2.11.7</scala.version>
+		<scala.dep.version>2.11</scala.dep.version>
+		<spark.version>1.6.1</spark.version>
 		<cassandra.version>1.4.0</cassandra.version>
 
 		<maven.compiler.plugin>3.3</maven.compiler.plugin>
@@ -71,6 +71,12 @@
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-mllib_${scala.dep.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_${scala.dep.version}</artifactId>
 			<version>${spark.version}</version>
 		</dependency>
 
