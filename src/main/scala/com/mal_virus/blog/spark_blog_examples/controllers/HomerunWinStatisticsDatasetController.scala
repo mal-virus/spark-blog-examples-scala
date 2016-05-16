@@ -1,10 +1,12 @@
 package com.mal_virus.blog.spark_blog_examples.controllers
 
 import com.mal_virus.blog.spark_blog_examples.Baseball
+
 import org.apache.spark.{SparkConf,SparkContext}
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.mllib.stat.Statistics
+import org.apache.spark.sql.DataFrameStatFunctions
 import org.apache.spark.util.StatCounter
+
 
 object HomerunWinStatisticsDatasetController extends Baseball {
   def main(args: Array[String]) {
@@ -57,14 +59,13 @@ object HomerunWinStatisticsDatasetController extends Baseball {
     // We don't need the key listed below, but mapGroups takes a function of (key,group)=>T
     val mappedTo = joined.mapGroups((key, results) => consolidate(results))  
     
-    // retrieve the values we care about and cast them back to RDDs
-    // since Statistics.corr requires RDD[Double]
+    // This function takes a dataframe and two rows to return the correlation as a double
+    val correlation = mappedTo.toDF.stat.corr("homeRuns","winningPercentage","pearson")
+    println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
+    
+    // If we want, we can turn our Dataset back to an RDD
     val homeruns = mappedTo map(_.homeRuns) rdd
     val winningPercentage = mappedTo map(_.winningPercentage) rdd
-    
-    // This function takes two RDD of doubles and a correlation type as String to return the correlation as a double
-    val correlation = Statistics.corr(homeruns,winningPercentage,"pearson")
-    println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
     
     val homerunStats = homeruns.stats
     // temporarily print out to console some example statistics that are
@@ -98,12 +99,16 @@ object HomerunWinStatisticsDatasetController extends Baseball {
    * Takes all Results and collects them into one season
    */
   def consolidate(results: Iterator[Result]) = {
-    val list = results.toList
-    Season(
-      list.map(_.homeruns).sum,
-      list.size,
-      list.map(_.win).sum)
-  }
+	  val list = results.toList
+	  val games = list.size
+	  val wins = list.map(_.win).sum 
+	  val winningPercentage = wins.toDouble/games.toDouble 
+	  Season(
+	    list.map(_.homeruns).sum,
+	    games,
+	    wins,
+	    winningPercentage)
+	}
   
   /**
    * This is the minimal version of our main method
@@ -128,12 +133,9 @@ object HomerunWinStatisticsDatasetController extends Baseball {
       .groupBy(_.key)
       .mapGroups((key, results) => consolidate(results))  
     
-    // Retrieve the results and cast them back to RDDs
-    val homeruns = mappedTo map(_.homeRuns) rdd
-    val winningPercentage = mappedTo map(_.winningPercentage) rdd
     
     // Run our analysis
-    val correlation = Statistics.corr(homeruns,winningPercentage,"pearson")
+    val correlation = mappedTo.toDF.stat.corr("homeRuns","winningPercentage","pearson")
     println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
     
     // Print
@@ -141,12 +143,10 @@ object HomerunWinStatisticsDatasetController extends Baseball {
       printf("**************Mean of %4$s: %f\n**************Standard deviation of %4$s: %f\n" +
              "**************Variance of %4$s: %f\n",s.mean,s.stdev,s.variance, n)
     }
-    printStatistics("homeruns",homeruns.stats)
-    printStatistics("winning percentage",winningPercentage.stats)
+    printStatistics("homeruns",mappedTo.map(_.homeRuns).rdd.stats)
+    printStatistics("winning percentage",mappedTo.map(_.winningPercentage).rdd.stats)
   }
 }
 case class Game(year: String, visitingTeam: String, homeTeam: String, visitingScore: Int, homeScore: Int, visitingHomeRuns: Int, homeHomeRuns: Int)
 case class Result(key: String, homeruns: Int, win: Int)
-case class Season(homeRuns: Double, games: Int, wins: Int) {
-  val winningPercentage = wins.toDouble/games.toDouble
-}
+case class Season(homeRuns: Double, games: Double, wins: Double, winningPercentage: Double)
