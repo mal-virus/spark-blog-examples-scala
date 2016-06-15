@@ -46,7 +46,7 @@ object HomerunWinStatisticsController extends Baseball {
     
     // This function takes two RDD of doubles and a correlation type as String to return the correlation as a double
     val correlation = Statistics.corr(homeruns,winningPercentage,"pearson")
-    println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
+    println("**************Pearson coefficient for homeruns to winning percentage " + correlation)
     
     val homerunStats = homeruns.stats
     // temporarily print out to console some example statistics that are
@@ -121,7 +121,7 @@ object HomerunWinStatisticsController extends Baseball {
     
     // Run our analysis
     val correlation = Statistics.corr(homeruns,winningPercentage,"pearson")
-    println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
+    println("**************Pearson coefficient for homeruns to winning percentage " + correlation)
     
     // Print
     val homerunStats = homeruns.stats
