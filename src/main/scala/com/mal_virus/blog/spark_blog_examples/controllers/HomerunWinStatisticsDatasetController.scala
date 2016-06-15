@@ -61,7 +61,7 @@ object HomerunWinStatisticsDatasetController extends Baseball {
     
     // This function takes a dataframe and two rows to return the correlation as a double
     val correlation = mappedTo.toDF.stat.corr("homeRuns","winningPercentage","pearson")
-    println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
+    println("**************Pearson coefficient for homeruns to winning percentage " + correlation)
     
     // If we want, we can turn our Dataset back to an RDD
     val homeruns = mappedTo map(_.homeRuns) rdd
@@ -136,7 +136,7 @@ object HomerunWinStatisticsDatasetController extends Baseball {
     
     // Run our analysis
     val correlation = mappedTo.toDF.stat.corr("homeRuns","winningPercentage","pearson")
-    println("**************Pearson coefficiant for homeruns to winning percentage " + correlation)
+    println("**************Pearson coefficient for homeruns to winning percentage " + correlation)
     
     // Print
     def printStatistics(n: String, s: StatCounter) {
