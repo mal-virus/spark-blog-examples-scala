@@ -89,9 +89,8 @@ object HomerunWinStatisticsDatasetController extends Baseball {
   def calculateResults(game: Game) = {
     val visitorKey = game.visitingTeam + game.year
     val homeKey = game.homeTeam + game.year
-    var visitingWin, homeWin = 0
-    if(game.visitingScore>game.homeScore) visitingWin = 1
-    if(game.homeScore>game.visitingScore) homeWin = 1
+    val visitingWin = if(game.visitingScore > game.homeScore) 1 else 0
+    var homeWin = if(game.homeScore > game.visitingScore) 1 else 0
     Seq(Result(visitorKey,game.visitingHomeRuns,visitingWin),Result(homeKey,game.homeHomeRuns,homeWin))
   }
   
